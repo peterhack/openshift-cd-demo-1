@@ -29,6 +29,7 @@ function usage() {
     echo "   --ephemeral                Optional    Deploy demo without persistent storage. Default false"
     echo "   --enable-che               Optional    Deploy Eclipse Che as an online IDE for code changes. Default false"
     echo "   --oc-options               Optional    oc client options to pass to all oc commands e.g. --server https://my.openshift.com"
+    echo "   --dynatrace		Optional    Dynatrace details for monitoring the pipelin e.g. --dynatrace dturl=abc12345.live.dynatrace.com apiToken=1234567890abcdefgh"
     echo
 }
 
@@ -41,6 +42,9 @@ ARG_DEPLOY_CHE=false
 ARG_ENABLE_QUAY=false
 ARG_QUAY_USER=
 ARG_QUAY_PASS=
+ARG_DYNATRACE=""
+ARG_DTURL=
+ARG_DTAPITOKEN=
 
 while :; do
     case $1 in
@@ -115,6 +119,11 @@ while :; do
         --enable-che|--deploy-che)
             ARG_DEPLOY_CHE=true
             ;;
+        --dynatrace)
+            ARG_DTURL=$2
+            ARG_DTAPITOKEN=$3
+            ARG_DYNATRACE='dynatrace'
+            ;;
         -h|--help)
             usage
             exit 0
@@ -142,7 +151,8 @@ done
 LOGGEDIN_USER=$(oc $ARG_OC_OPS whoami)
 OPENSHIFT_USER=${ARG_USERNAME:-$LOGGEDIN_USER}
 PRJ_SUFFIX=${ARG_PROJECT_SUFFIX:-`echo $OPENSHIFT_USER | sed -e 's/[-@].*//g'`}
-GITHUB_ACCOUNT=${GITHUB_ACCOUNT:-siamaksade}
+# GITHUB_ACCOUNT=${GITHUB_ACCOUNT:-siamaksade}
+GITHUB_ACCOUNT=${GITHUB_ACCOUNT:-peterhack}
 GITHUB_REF=${GITHUB_REF:-ocp-3.11}
 
 function deploy() {
@@ -165,6 +175,11 @@ function deploy() {
     oc $ARG_OC_OPS annotate --overwrite namespace cicd-$PRJ_SUFFIX  demo=openshift-cd-$PRJ_SUFFIX >/dev/null 2>&1
 
     oc $ARG_OC_OPS adm pod-network join-projects --to=cicd-$PRJ_SUFFIX dev-$PRJ_SUFFIX stage-$PRJ_SUFFIX >/dev/null 2>&1
+  fi
+
+# Adding Dynatrace Secret for Dynatrace-CLI to use
+  if [ $ARG_DYNATRACE = "dynatrace" ] ; then
+    oc -n cicd-$PRJ_SUFFIX create secret generic dtcli --from-literal="dtURL=$ARG_DTURL" --from-literal="apiToken=$ARG_DTAPITOKEN"
   fi
 
   sleep 2

@@ -289,7 +289,7 @@ objects:
            
             export GIT_COMMITTER_NAME='Dynatrace Demo'
             export GIT_COMMITTER_EMAIL='demo@example.com'
-            oc new-app https://github.com/peterhack/dynatrace-cli.git \
+            oc new-app https://github.com/peterhack/dynatrace-cli \
               --param PROJECT_NAME=$CICD_NAMESPACE \
               --param DOMAIN_NAME=$HOSTNAME \
               --param SKIP_TLS_VERIFY=true

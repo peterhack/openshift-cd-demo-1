@@ -128,7 +128,6 @@ objects:
                   script {
                     openshift.withCluster() {
                       openshift.withProject(env.DEV_PROJECT) {
-                        openshift.tag("dynatrace:build","ENVIRONMENT:dev")
                         openshift.selector("bc", "tasks").startBuild("--from-file=target/ROOT.war", "--wait=true")
                       }
                     }
@@ -140,7 +139,6 @@ objects:
                   script {
                     openshift.withCluster() {
                       openshift.withProject(env.DEV_PROJECT) {
-                        openshift.tag("Environment:Dev","Service:tasks","JOB_NAME:${JOB_NAME}")
                         openshift.selector("dc", "tasks").rollout().latest();
                       }
                     }

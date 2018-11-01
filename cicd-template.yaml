@@ -286,7 +286,7 @@ objects:
             oc label dc jenkins app=jenkins --overwrite 
             
             # Dynatrace CLI
-           
+             
             export GIT_COMMITTER_NAME='Dynatrace Demo'
             export GIT_COMMITTER_EMAIL='demo@example.com'
             oc new-app https://github.com/peterhack/dynatrace-cli \
@@ -297,7 +297,7 @@ objects:
             oc env --from=secret/dtcli dc/dynatrace-cli
             oc rollout status -w dc dynatrace-cli
 
-            sleep 30
+            sleep 300
           
             DTCLIURL=$(oc get route dynatrace-cli -o template --template='{{.spec.host}}' | sed "s/dynatrace-cli-CICDNAMESPACE.//g")
             DTCLI=$(oc get pod -o name --selector app=dynatrace-cli | sed s/pods.//g)

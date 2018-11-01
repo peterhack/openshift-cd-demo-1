@@ -302,7 +302,7 @@ objects:
             sleep 30
           
             DTCLIURL=$(oc get route dynatrace-cli -o template --template='{{.spec.host}}' | sed "s/dynatrace-cli-CICDNAMESPACE.//g")
-            DTCLI=$(oc get pod -o name --selector app=dynatrace-cli | sed s/pods.//g)
+            DTCLI=$(oc get pod -o name --selector app=dynatrace-cli | cut -d '/' -f 2)
             # apply credentials to Dynatrace-CLI
             oc exec $DTCLI -it -- bash -c 'python dtcli.py config apitoken $APITOKEN tenanthost $DTURL'
             

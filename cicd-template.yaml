@@ -287,17 +287,19 @@ objects:
             
             # Dynatrace CLI
              
-            export GIT_COMMITTER_NAME='Dynatrace Demo'
-            export GIT_COMMITTER_EMAIL='demo@example.com'
-            oc new-app https://github.com/peterhack/dynatrace-cli \
-              --param PROJECT_NAME=$CICD_NAMESPACE \
-              --param DOMAIN_NAME=$HOSTNAME \
-              --param SKIP_TLS_VERIFY=true
+            # export GIT_COMMITTER_NAME='Dynatrace Demo'
+            # export GIT_COMMITTER_EMAIL='demo@example.com'
+            # oc new-app https://github.com/peterhack/dynatrace-cli \
+            oc new-app --docker-image=quay.io/hackatdt/dynatrace-cli \
+               --name=dynatrace-cli \
+               --param PROJECT_NAME=$CICD_NAMESPACE \
+               --param DOMAIN_NAME=$HOSTNAME \
+               --param SKIP_TLS_VERIFY=true
             oc expose svc/dynatrace-cli
             oc env --from=secret/dtcli dc/dynatrace-cli
             oc rollout status -w dc dynatrace-cli
 
-            sleep 300
+            sleep 30
           
             DTCLIURL=$(oc get route dynatrace-cli -o template --template='{{.spec.host}}' | sed "s/dynatrace-cli-CICDNAMESPACE.//g")
             DTCLI=$(oc get pod -o name --selector app=dynatrace-cli | sed s/pods.//g)
